@@ -42,7 +42,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: github.event.inputs.release == 'true'
         with:
-          tag_name: 1.0
+          tag_name: "1.0"
           draft: true
           prerelease: false
           files: GoogleWebViewOverlay.apk
