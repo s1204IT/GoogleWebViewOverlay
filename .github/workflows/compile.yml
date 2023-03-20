@@ -1,0 +1,48 @@
+name: Compile
+
+on:
+  push:
+    paths:
+      - '.github/workflows/compile.yml'
+      - 'src/**'
+      - 'sign/**'
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  compile:
+    name: Compile Overlay APK
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get install -y aapt zipalign
+
+      - name: Compile and Sign
+        run: |
+          aapt package -M src/AndroidManifest.xml -S src/res/ -I /usr/local/lib/android/sdk/platforms/android-28/android.jar -F GoogleWebViewOverlay.apk.u
+          zipalign -v 4 GoogleWebViewOverlay.apk.u GoogleWebViewOverlay.apk.s
+          java -jar sign/signapk.jar sign/testkey.x509.pem sign/testkey.pk8 GoogleWebViewOverlay.apk.s GoogleWebViewOverlay.apk
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: GoogleWebViewOverlay-28
+          path: GoogleWebViewOverlay.apk
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: github.event.inputs.release == 'true'
+        with:
+          tag_name: 1.0
+          draft: true
+          prerelease: false
+          files: GoogleWebViewOverlay.apk
