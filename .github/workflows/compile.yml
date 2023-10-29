@@ -22,7 +22,7 @@ jobs:
           export PATH="$ANDROID_HOME/build-tools/30.0.3:$PATH"
           aapt p -M src/AndroidManifest.xml -S src/res/ -I $ANDROID_HOME/platforms/android-28/android.jar --min-sdk-version 28 --target-sdk-version 28 -F GoogleWebViewOverlay.apk
           zipalign -v 4 GoogleWebViewOverlay.apk GoogleWebViewOverlay-28.apk
-          apksigner sign --cert sign/testkey.x509.pem --key sign/cert.pk8 GoogleWebViewOverlay-28.apk
+          apksigner sign -v --cert sign/testkey.x509.pem --key sign/cert.pk8 GoogleWebViewOverlay-28.apk
 
       - name: Upload
         uses: actions/upload-artifact@v3
