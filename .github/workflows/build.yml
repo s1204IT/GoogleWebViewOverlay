@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build.yml'
+      - 'app/**'
+      - 'gradle/**'
+      - '*.gradle'
+      - '*.properties'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk: [ '24', '25', '26', '27', '28' ]
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+            ./.gradle/
+          key: ${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Build with Gradle
+        run: |
+          sed -e 's/28/${{ matrix.sdk }}/g' -i app/build.gradle
+          if [ ${{ matrix.sdk }} -lt 26 ]; then sed -e 's/android:isStatic="true"//g' -i app/src/main/AndroidManifest.xml; fi
+          ./gradlew assembleRelease
+          cp -f app/build/outputs/apk/release/app-release.apk GoogleWebViewOverlay-${{ matrix.sdk }}.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GoogleWebViewOverlay-${{ matrix.sdk }}
+          path: GoogleWebViewOverlay-${{ matrix.sdk }}*.apk

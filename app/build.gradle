@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 28
+
+    defaultConfig {
+        applicationId 'com.google.android.overlay.googlewebview'
+        minSdk 28
+        targetSdk 28
+        versionName "1.0"
+        versionCode 1
+        proguardFiles += 'proguard-rules.pro'
+    }
+
+    signingConfigs {
+        android {
+            storeFile file('android.jks')
+            storePassword 'android'
+            keyAlias 'android'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.android
+        }
+    }
+}
