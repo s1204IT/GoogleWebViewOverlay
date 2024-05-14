@@ -29,4 +29,8 @@ android {
             signingConfig signingConfigs.android
         }
     }
+
+    buildFeatures {
+        buildConfig false
+    }
 }
